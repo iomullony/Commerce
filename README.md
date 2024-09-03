@@ -24,6 +24,8 @@ Complete the implementation of your auction site. You must fulfill the following
 - You’re welcome to modify the CSS as much as you’d like, to make the website your own! Some sample screenshots are shown at the top of this page. These are meant only to be examples: your application need not be aesthetically the same as the screenshots here (you’re encouraged to be creative!).
 
 ## Run Program
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py runserver
+`python3 manage.py makemigrations`
+
+`python3 manage.py migrate`
+
+`python3 manage.py runserver`
