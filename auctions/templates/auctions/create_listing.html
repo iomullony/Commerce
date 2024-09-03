@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2>New Listing</h2>
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        
+          <p>{{ form.title }}</p>
+          <p>{{ form.description }}</p>
+          <p>{{ form.image }}</p>
+          <p>{{ form.starting_bid }}</p>        
+
+          <p>
+            <select name="category" id="{{ form.category.id_for_label }}" required>
+                <option value="" disabled selected>Category</option>
+                {% for value, display in form.category.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}">{{ display }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+          </p>
+
+        <button type="submit">Create</button>
+    </form>
+
+{% endblock %}

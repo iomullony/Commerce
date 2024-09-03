@@ -1,0 +1,61 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2>{{ auction.title }}</h2>
+
+    {% if auction.image %}
+        <p><img src="{{ auction.image }}" alt="{{ auction.title }}"></p>
+    {% endif %}
+
+    <!-- Information -->
+    <p><strong>Description:</strong> {{ auction.description }}</p>
+    <p><strong>Price:</strong> ${{ auction.starting_bid }}</p>
+    <p><strong>Category:</strong> {{ auction.category.name }}</p>
+    <p><strong>Seller:</strong> {{ auction.seller.username }}</p>
+    <p><strong>Comments:</strong></p>
+    <ul>
+        {% for comment in comments %}
+            <li><strong>@{{ comment.user.username}} </strong>{{ comment.comment }}</li>
+        {% empty %}
+            <li>No comments</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Buttons -->
+    {% if user.is_authenticated %}
+        {% if is_seller %}
+            <form action="{% url 'close_auction' auction.id %}" method="post">
+                {% csrf_token %}
+                <button href="{% url 'close_auction' auction.id %}">Close</button>
+            </form>
+        {% else %}
+        <div style="display: inline;">
+            {% if in_watchlist %}
+                <form action="{% url 'remove_from_watchlist' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="id" value="{{ auction.id }}">
+                        <i class="glyphicon glyphicon-heart"></i>
+                    </button>
+                </form>
+            {% else %}
+                <form action="{% url 'add_to_watchlist' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="id" value="{{ auction.id }}">
+                        <i class="glyphicon glyphicon-heart-empty"></i>
+                    </button>
+                </form>
+            {% endif %}
+            <form action="{% url 'bid' auction.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Bid</button>
+            </form>
+            <form action="{% url 'add_comment' auction.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Add comment</button>
+            </form>
+        </div>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

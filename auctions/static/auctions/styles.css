@@ -1,0 +1,35 @@
+body {
+    padding: 10px;
+}
+
+.auction-listings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auction-item {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    height: 200px;
+}
+
+.auction-image {
+    width: 200px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.auction-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.auction-details {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
