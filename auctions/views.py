@@ -101,9 +101,7 @@ def create_listing(request):
                 category=category
             )
 
-            return render(request, "auctions/index.html", {
-                "auctions": Auction.objects.all()
-            })
+            return redirect('index')
     else:
         form = NewListing()
 
@@ -130,6 +128,7 @@ def auction(request, auction_id):
     comments = Comment.objects.filter(item=auction)
     is_seller = auction.seller == request.user
     in_watchlist = Watchlist.objects.filter(item=auction)
+
     return render(request, 'auctions/auction.html', {
         'auction': auction,
         'comments': comments,
@@ -142,9 +141,7 @@ def close_auction(request, auction_id):
     if request.method == "POST":
         return HttpResponse("close auction")
     else:
-        return render(request, "auctions/index.html", {
-            "auctions": Auction.objects.all()
-        })
+        return redirect('index')
 
 
 
@@ -152,18 +149,24 @@ def bid(request, auction_id):
     if request.method == "POST":
         return HttpResponse("bid")
     else:
-        return render(request, "auctions/index.html", {
-            "auctions": Auction.objects.all()
-        })
+        return redirect('index')
 
 
 def add_comment(request, auction_id):
     if request.method == "POST":
-        return HttpResponse("add comment")
+        
+        comment = request.POST.get('comment')
+        item = Auction.objects.get(id=auction_id)
+        
+        Comment.objects.create(
+            user=request.user,
+            item=item,
+            comment=comment
+        )    
+    
+        return redirect('auction', auction_id=auction_id)
     else:
-        return render(request, "auctions/index.html", {
-            "auctions": Auction.objects.all()
-        })
+        return redirect('index')
 
 
 def add_to_watchlist(request):
@@ -175,13 +178,9 @@ def add_to_watchlist(request):
                 item=item
             )
 
-        return render(request, "auctions/watchlist.html", {
-            "auctions": Watchlist.objects.filter(user=request.user)
-        })
+        return redirect('watchlist')
     else:
-        return render(request, "auctions/index.html", {
-            "auctions": Auction.objects.all()
-        })
+        return redirect('index')
 
 
 def remove_from_watchlist(request):
@@ -189,10 +188,6 @@ def remove_from_watchlist(request):
         item = Auction.objects.get(id=request.POST.get('id'))
         Watchlist.objects.get(user=request.user, item=item).delete()
 
-        return render(request, "auctions/watchlist.html", {
-            "auctions": Watchlist.objects.filter(user=request.user)
-        })
+        return redirect('watchlist')
     else:
-        return render(request, "auctions/index.html", {
-            "auctions": Auction.objects.all()
-        })
+        return redirect('index')

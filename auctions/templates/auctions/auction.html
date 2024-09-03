@@ -52,6 +52,7 @@
             </form>
             <form action="{% url 'add_comment' auction.id %}" method="post" style="display: inline;">
                 {% csrf_token %}
+                <input type="text" name="comment" placeholder="Write your comment here" required>
                 <button type="submit">Add comment</button>
             </form>
         </div>
