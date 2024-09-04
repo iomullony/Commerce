@@ -2,9 +2,10 @@ from django.contrib import messages
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import Auction, Bid, User, Category, Comment, Watchlist
 
@@ -79,7 +80,7 @@ def register(request):
         return render(request, "auctions/register.html")
     
 
-# put for auction a new item
+@login_required(login_url='/login')
 def create_listing(request):
 
     if request.method == "POST":
@@ -111,6 +112,7 @@ def create_listing(request):
     })
 
 
+@login_required(login_url='/login')
 def categories(request):
     categories = Category.objects.all()
     selected_category_id = request.GET.get('category')
@@ -129,6 +131,7 @@ def categories(request):
     })
 
 
+@login_required(login_url='/login')
 def watchlist(request):
     saved_items = request.user.items_saved.select_related('item').all()
     auctions = [item.item for item in saved_items]  # Extracting the actual `Auction` objects
@@ -138,6 +141,7 @@ def watchlist(request):
     })
 
 
+@login_required(login_url='/login')
 def auction(request, auction_id):
     auction = Auction.objects.get(id=auction_id)
     comments = auction.item_comments.all()
@@ -152,6 +156,7 @@ def auction(request, auction_id):
     })
 
 
+@login_required(login_url='/login')
 def close_auction(request, auction_id):
     if request.method == "POST":
         item = Auction.objects.get(id=auction_id)
@@ -173,6 +178,7 @@ def close_auction(request, auction_id):
         return redirect('index')
 
 
+@login_required(login_url='/login')
 def reopen_auction(request, auction_id):
     if request.method == "POST":
         item = Auction.objects.get(id=auction_id)
@@ -185,6 +191,7 @@ def reopen_auction(request, auction_id):
         return redirect('index')
 
 
+@login_required(login_url='/login')
 def bid(request, auction_id):
     if request.method == "POST":
         item = Auction.objects.get(id=auction_id)
@@ -233,6 +240,7 @@ def bid(request, auction_id):
         return redirect('index')
 
 
+@login_required(login_url='/login')
 def add_comment(request, auction_id):
     if request.method == "POST":
         
@@ -250,6 +258,7 @@ def add_comment(request, auction_id):
         return redirect('index')
 
 
+@login_required(login_url='/login')
 def add_to_watchlist(request):
     if request.method == "POST":
         item = Auction.objects.get(id=request.POST.get('id'))
@@ -264,6 +273,7 @@ def add_to_watchlist(request):
         return redirect('index')
 
 
+@login_required(login_url='/login')
 def remove_from_watchlist(request):
     if request.method == "POST":
         item = Auction.objects.get(id=request.POST.get('id'))
