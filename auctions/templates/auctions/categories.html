@@ -2,22 +2,39 @@
 
 {% block body %}
     <h2>Categories</h2>
-    <ul>
-        {% for category in categories %}
-            <li>
-                <strong>{{ category.name }}</strong>
-                <ul>
-                    {% for auction in category.auction_set.all %}
-                        <li>
-                            <a href="{% url 'auction' auction.id %}">{{ auction.title }}</a> - {{ auction.description }}
-                        </li>
-                    {% empty %}
-                        <li>No auctions in this category</li>
-                    {% endfor %}
-                </ul>
-            </li>
+    
+    <!-- Category Selection Form -->
+    <form method="get" action="{% url 'categories' %}">
+        <label for="category-select">Choose a category:</label>
+        <select id="category-select" name="category">
+            <option value="">Show All</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category and category.id == selected_category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    
+    <!-- Display Auctions -->
+    <div class="auction-listings">
+        {% for auction in auctions %}
+            <div class="auction-item">
+
+                <div class="auction-image">
+                    <img src="{{ auction.image }}" alt="{{ auction.title }}">
+                </div>
+
+                <div class="auction-details">
+                    <h3><a href="{% url 'auction' auction.id %}">{{ auction.title }}</a></h3>
+                    <p><strong>Price:</strong> ${{ auction.starting_bid }}</p>
+                    <p>{{ auction.description }}</p>
+                </div>
+                
+            </div>
         {% empty %}
-            <li>No active listings</li>
+            <p>No active listings</p>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}

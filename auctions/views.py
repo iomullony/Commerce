@@ -112,9 +112,20 @@ def create_listing(request):
 
 
 def categories(request):
-    categories = Category.objects.prefetch_related('auction_set').all()
-    return render(request, "auctions/categories.html", {
-            "categories": categories
+    categories = Category.objects.all()
+    selected_category_id = request.GET.get('category')
+    
+    if selected_category_id:
+        auctions = Auction.objects.filter(category_id=selected_category_id)
+        selected_category = Category.objects.get(id=selected_category_id)
+    else:
+        auctions = Auction.objects.all()
+        selected_category = None
+    
+    return render(request, 'auctions/categories.html', {
+        'categories': categories,
+        'auctions': auctions,
+        'selected_category': selected_category,
     })
 
 
