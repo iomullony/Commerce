@@ -147,10 +147,14 @@ def close_auction(request, auction_id):
 
 def bid(request, auction_id):
     if request.method == "POST":
+        item = Auction.objects.get(id=auction_id)
+
         try:
             # Ensure bid is a valid number
             bid = float(request.POST.get('bid'))
-            item = Auction.objects.get(id=auction_id)
+            if bid <= 0:
+                messages.error(request, "Your bid can't be 0 or less.")
+                return redirect('auction', auction_id=auction_id)
         except (TypeError, ValueError):
             messages.error(request, "Invalid bid amount. Please enter a number.")
             return redirect('auction', auction_id=auction_id)
