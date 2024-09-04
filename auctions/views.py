@@ -120,13 +120,13 @@ def categories(request):
 
 def watchlist(request):
     return render(request, "auctions/watchlist.html", {
-        "auctions": Watchlist.objects.filter(user=request.user)
+        "auctions": request.user.items_saved.all()
     })
 
 
 def auction(request, auction_id):
     auction = Auction.objects.get(id=auction_id)
-    comments = Comment.objects.filter(item=auction)
+    comments = auction.item_comments.all()
     is_seller = auction.seller == request.user
     in_watchlist = Watchlist.objects.filter(item=auction)
 
@@ -143,7 +143,6 @@ def close_auction(request, auction_id):
         return HttpResponse("close auction")
     else:
         return redirect('index')
-
 
 
 def bid(request, auction_id):
