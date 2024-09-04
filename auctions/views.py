@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -5,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import Auction, User, Category, Comment, Watchlist
+from .models import Auction, Bid, User, Category, Comment, Watchlist
 
 
 class NewListing(forms.Form):
@@ -147,7 +148,41 @@ def close_auction(request, auction_id):
 
 def bid(request, auction_id):
     if request.method == "POST":
-        return HttpResponse("bid")
+        try:
+            # Ensure bid is a valid number
+            bid = float(request.POST.get('bid'))
+            item = Auction.objects.get(id=auction_id)
+        except (TypeError, ValueError):
+            messages.error(request, "Invalid bid amount. Please enter a number.")
+            return redirect('auction', auction_id=auction_id)
+
+        # Get the highest bid
+        try:
+            highest_bid = Bid.objects.order_by("money")[-1].filter(item=item).money
+        except:
+            highest_bid = item.starting_bid
+
+        # Ensure bid is higher than the current highest bid
+        if highest_bid and bid <= highest_bid:
+            messages.error(request, "Your bid must be higher than the current highest bid.")
+            return redirect('auction', auction_id=auction_id)
+        
+        try:
+            # Create bid
+            Bid.objects.create(
+                user=request.user,
+                item=item,
+                money=bid
+            )
+
+            # Save data in the Auction model too
+            item.starting_bid = bid
+            item.save()
+        except:
+            messages.error(request, "Something went wrong.")
+    
+        messages.success(request, "Your bid was placed successfully!")
+        return redirect('auction', auction_id=auction_id)
     else:
         return redirect('index')
 

@@ -48,6 +48,7 @@
             {% endif %}
             <form action="{% url 'bid' auction.id %}" method="post" style="display: inline;">
                 {% csrf_token %}
+                <input type="number" name="bid" placeholder="Bid" required>
                 <button type="submit">Bid</button>
             </form>
             <form action="{% url 'add_comment' auction.id %}" method="post" style="display: inline;">
@@ -57,6 +58,17 @@
             </form>
         </div>
         {% endif %}
+    {% endif %}S
+
+    <!-- Error messages -->
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="{% if message.tags %}alert {{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
 {% endblock %}

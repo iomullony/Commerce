@@ -33,3 +33,11 @@ body {
     flex-direction: column;
     justify-content: center;
 }
+
+.alert.error {
+    color: red;
+}
+
+.alert.success {
+    color: green;
+}
