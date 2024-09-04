@@ -12,7 +12,7 @@ from .models import Auction, Bid, User, Category, Comment, Watchlist
 class NewListing(forms.Form):
     title = forms.CharField(label="", required=True, widget=forms.TextInput(attrs={'placeholder': 'Title'}))
     description = forms.CharField(label="", widget=forms.Textarea(attrs={"rows":"3",'placeholder': 'Description', 'max_length': 5000}))
-    image = forms.CharField(label="", required=False, widget=forms.TextInput(attrs={'placeholder': 'Image link'}))
+    image = forms.CharField(label="", required=False, widget=forms.TextInput(attrs={'placeholder': 'Image link', 'autocomplete': "off"}))
     starting_bid = forms.DecimalField(label="", required=True, min_value=0, decimal_places=2, widget=forms.NumberInput(attrs={'placeholder': 'Starting Bid'}))
     category = forms.ChoiceField(label="", required=True, choices=[])
 
@@ -140,7 +140,33 @@ def auction(request, auction_id):
 
 def close_auction(request, auction_id):
     if request.method == "POST":
-        return HttpResponse("close auction")
+        item = Auction.objects.get(id=auction_id)
+        highest_bid = item.item_bids.order_by("-money").first()
+
+        # There's no winner
+        if highest_bid is None:
+            item.winner = request.user # We put that the winner is the seller
+            item.save()
+            messages.success(request, "Closed successfully! There was no winner.")
+        # Winner is the user with the highest bid
+        else:
+            item.winner = highest_bid.user
+            item.save()
+            messages.success(request, "Closed successfully! The winner is " + highest_bid.user.username)
+
+        return redirect('auction', auction_id=auction_id)
+    else:
+        return redirect('index')
+
+
+def reopen_auction(request, auction_id):
+    if request.method == "POST":
+        item = Auction.objects.get(id=auction_id)
+        item.winner = None
+        item.save()
+        messages.success(request, "Reopened successfully!")
+
+        return redirect('auction', auction_id=auction_id)
     else:
         return redirect('index')
 
@@ -160,13 +186,16 @@ def bid(request, auction_id):
             return redirect('auction', auction_id=auction_id)
 
         # Get the highest bid
-        try:
-            highest_bid = Bid.objects.order_by("money")[-1].filter(item=item).money
-        except:
+        highest_bid = item.item_bids.order_by("-money").first()
+
+        if highest_bid is None:
+            # Handle the case where there are no bids
             highest_bid = item.starting_bid
+        else:
+            highest_bid = highest_bid.money
 
         # Ensure bid is higher than the current highest bid
-        if highest_bid and bid <= highest_bid:
+        if bid <= highest_bid:
             messages.error(request, "Your bid must be higher than the current highest bid.")
             return redirect('auction', auction_id=auction_id)
         

@@ -33,7 +33,7 @@ class Auction(models.Model):
 # Bid money
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item = models.ForeignKey(Auction, on_delete=models.CASCADE)
+    item = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='item_bids')
     money = models.DecimalField(decimal_places=2, max_digits=12)
 
  
