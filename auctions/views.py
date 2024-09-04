@@ -130,8 +130,11 @@ def categories(request):
 
 
 def watchlist(request):
+    saved_items = request.user.items_saved.select_related('item').all()
+    auctions = [item.item for item in saved_items]  # Extracting the actual `Auction` objects
+
     return render(request, "auctions/watchlist.html", {
-        "auctions": request.user.items_saved.all()
+        "auctions": auctions
     })
 
 

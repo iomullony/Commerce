@@ -1,0 +1,19 @@
+<div class="auction-listings">
+    {% for auction in auctions %}
+        <div class="auction-item">
+
+            <div class="auction-image">
+                <img src="{{ auction.image }}" alt="{{ auction.title }}">
+            </div>
+
+            <div class="auction-details">
+                <h3><a href="{% url 'auction' auction.id %}">{{ auction.title }}</a></h3>
+                <p><strong>Price:</strong> ${{ auction.starting_bid }}</p>
+                <p>{{ auction.description }}</p>
+            </div>
+            
+        </div>
+    {% empty %}
+        <p>No active listings</p>
+    {% endfor %}
+</div>

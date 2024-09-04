@@ -3,23 +3,6 @@
 {% block body %}
     <h2>Watchlist</h2>
 
-    <div class="auction-listings">
-        {% for auction in auctions %}
-            <div class="auction-item">
-
-                <div class="auction-image">
-                    <img src="{{ auction.item.image }}" alt="{{ auction.item.title }}">
-                </div>
-
-                <div class="auction-details">
-                    <h3><a href="{% url 'auction' auction.item.id %}">{{ auction.item.title }}</a></h3>
-                    <p><strong>Price:</strong> ${{ auction.item.starting_bid }}</p>
-                    <p>{{ auction.item.description }}</p>
-                </div>
-                
-            </div>
-        {% empty %}
-            <p>Nothing saved</p>
-        {% endfor %}
-    </div>
+    
+    {% include 'auctions/auction_list.html' %}
 {% endblock %}
